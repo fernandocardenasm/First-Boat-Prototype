@@ -17,6 +17,7 @@ public class boat : MonoBehaviour {
 	public float maxSideSpeed;
     public float accelerateSpeed = 1000f;
     public float inputSpeed = 2.5f;
+	public float inputUsed = 0; //0: Keyboard, 1: Android
     //The side limits, which the boat can not cross.
     public Transform leftLimit;
 	public Transform rightLimit;
@@ -33,7 +34,7 @@ public class boat : MonoBehaviour {
     // threshold for shooting waves
     private float nextFire;
 
-    // Healthbar
+    // Healthbar variables declerations 
     public RectTransform healthTransform;
     private float cachedY;
     private float minXValue;
@@ -41,8 +42,16 @@ public class boat : MonoBehaviour {
     public int maxHealth;
     public Text healthText;
     public Image visualHealth;
+    private Vector3 movment;
+    public float healthSpeed;
+    public Canvas canvas; // health bar canvas
+    private float currentXValue;
+    public float coolDown;// taking damage after a period of time 
+    private bool onCD; // checks if it is in the cooldown period (can take damage or not )or not 
     private int currentHealth;
 
+	//h
+	public float h = 0;
 
 
 	public int CurrentHealth
@@ -55,7 +64,7 @@ public class boat : MonoBehaviour {
         set
         {
             currentHealth = value;
-            HandleHealth();
+           // HandleHealth();
         }
     }
 
@@ -63,11 +72,24 @@ public class boat : MonoBehaviour {
     void Start () {
         rbody = GetComponent<Rigidbody>();
 
-        // Healthbar
+      //***** Healthbar***************
+
+        // caches the healthbar as start positions
         cachedY = healthTransform.position.y;
+
+        //The max value of the x-Position 
         maxXValue = healthTransform.position.x;
         minXValue = healthTransform.position.x - healthTransform.rect.width;
         CurrentHealth = maxHealth;
+
+		// Calculating the min value of the x-Position       
+		minXValue = healthTransform.position.x - healthTransform.rect.width * canvas.scaleFactor;
+
+		// Set the current health to the max health which is 100 
+		currentHealth = maxHealth;
+
+		// set the cooldamage to false
+		onCD = false;
 
         try
         {
@@ -103,8 +125,24 @@ public class boat : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");        
+
+		if (inputUsed == 0) {
+			h = Input.GetAxis ("Horizontal");	
+		} else if (inputUsed == 1) {
+			//Move Left the boat with the device
+			if (inputSpeed > 2) {
+				h = -1;
+			} else if (inputSpeed < -2) {
+				//Move Right the boat with the device
+				h = 1;
+			} else {
+				h = 0;
+			}
+		}
+        
+        //float v = Input.GetAxis("Vertical");        
+
+        HandleHealth();
 
 		//Move Left or right
 		//Validates if the boat is colliding with the left limit or the right limit
@@ -143,6 +181,7 @@ public class boat : MonoBehaviour {
         }
     }
 
+    // Function to handle the healthbar 
     private void HandleHealth()
     {
         if (currentHealth > 0)
@@ -150,18 +189,24 @@ public class boat : MonoBehaviour {
         else
         {
             currentHealth = 0;
-            healthText.text = "Health:" + currentHealth;
+            //healthText.text = "Health:" + currentHealth;
         }
-        float currentXValue = MapVlaues(currentHealth, 0, maxHealth, minXValue, maxXValue);
+
+        // maps the x-min and x-max postion to the health range [0, 100]
+        currentXValue = MapVlaues(currentHealth, 0, maxHealth, minXValue, maxXValue);
+        // sets the position of the health after reduction
         healthTransform.position = new Vector3(currentXValue, cachedY);
+        //healthTransform.position = Vector3.Lerp(healthTransform.position, new Vector3(currentXValue, cachedY), Time.deltaTime);
 
 
-
-        if (currentHealth > maxHealth / 2) //more than 50
+        //******Changing the healthbar color 
+        //more than 50 healthbar is in green color
+        if (currentHealth > maxHealth / 2) 
         {
             visualHealth.color = new Color32((byte)MapVlaues(currentHealth, maxHealth / 2, maxHealth, 255, 0), 255, 0, 255);
         }
-        else // less than 50
+        // less than 50 changed to yellow and red
+        else
         {
             visualHealth.color = new Color32(255, (byte)MapVlaues(currentHealth, 0, maxHealth / 2, 0, 255), 0, 255);
         }
@@ -172,15 +217,17 @@ public class boat : MonoBehaviour {
 
         if (currentHealth > 0)
         {     // Boat hits any rock, rock gets destroyed
-            if (col.collider.name == "Group003")
+            if (!onCD && col.collider.name == "Group003")
             {
 
-                //print("boat hits rock - destroy rock and take life from boat");
+                print("boat hits rock - destroy rock and take life from boat");
+                StartCoroutine(CooldownDmg());
                 CurrentHealth -= 24;
             }
-            else if (col.collider.name == "toad 1")
+            else if (!onCD && col.collider.name == "toad 1")
             {
-                //print("boat hits monster - destroy monster and take life from boat");
+                print("boat hits monster - destroy monster and take life from boat");
+                StartCoroutine(CooldownDmg());
                 CurrentHealth -= 45;
             }
             else if (col.collider.name == "Shooting_Wave(Clone)")
@@ -191,14 +238,25 @@ public class boat : MonoBehaviour {
         }
         else
         {
-           
+            ContactPoint contact = col.contacts[0];
+            Quaternion rot = Quaternion.FromToRotation(Vector3.up, contact.normal);
+            Vector3 pos = contact.point;
+            Instantiate(explosionPrefab, pos, rot);
+            //gameObject.transform.localScale = new Vector3(0, 0, 0);
             StartCoroutine(WaitAndRestart(0.5F));
+            
         }
 
     }
-
+    IEnumerator CooldownDmg()
+    {
+        onCD = true;
+        yield return new WaitForSeconds(coolDown);
+        onCD = false;
+    }
+		
 	IEnumerator WaitAndRestart(float waitTime) {
-        cleanstuff();
+		cleanstuff ();
 		Destroy(gameObject, 1);
 		yield return new WaitForSeconds(waitTime);
 		print ("waiting to restart...");

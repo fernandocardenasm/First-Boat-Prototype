@@ -306,7 +306,7 @@ public class boat : MonoBehaviour {
                     s = myList.AcceptSocket();
                     try
                     {
-                        byte[] b = new byte[102400];
+                        byte[] b = new byte[182400];
                         while (true)
                         {
                             //int k = s.Receive(b);
@@ -341,7 +341,7 @@ public class boat : MonoBehaviour {
                             msg = words[3];
                             inputSpeed = float.Parse(words[3].Substring(0, 3));
                             vibFlag = words[4].Substring(0, 4);
-                            print(inputSpeed);
+                           // print(inputSpeed);
                             if (mRunning == false)
                                 break;
 

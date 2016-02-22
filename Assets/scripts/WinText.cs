@@ -14,14 +14,15 @@ public class WinText : MonoBehaviour {
 
 	private int firstlevel = 1;
 	private int _endscene = 2;
+    public AudioSource gameWin;
 
-	void Awake () 
+    void Awake () 
 
 	{
 		winText = Canvas.GetComponentInChildren<Text> ();
 		winText.color = Color.clear;
 
-	}
+    }
 
 	void Update () 
 
@@ -41,7 +42,8 @@ public class WinText : MonoBehaviour {
 
 		if (endscene) 
 		{
-			SceneManager.LoadScene(_endscene);	
+            
+            SceneManager.LoadScene(_endscene);	
 		}
 
 	}

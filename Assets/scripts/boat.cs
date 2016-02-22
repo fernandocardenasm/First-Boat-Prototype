@@ -8,6 +8,7 @@ using System.Net;
 using System;
 using System.Text;
 using System.Collections.Generic;
+[RequireComponent(typeof(AudioSource))]
 public class boat : MonoBehaviour {
 
 	private int firstlevel = 1;
@@ -17,7 +18,7 @@ public class boat : MonoBehaviour {
 	public float maxSideSpeed;
     public float accelerateSpeed = 1000f;
     public float inputSpeed = 2.5f;
-	public float inputUsed = 0; //0: Keyboard, 1: Android
+	public float inputUsed = 1; //0: Keyboard, 1: Android
     //The side limits, which the boat can not cross.
     public Transform leftLimit;
 	public Transform rightLimit;
@@ -52,9 +53,13 @@ public class boat : MonoBehaviour {
 
 	//h
 	public float h = 0;
+    public AudioSource hit;
+    public AudioSource shootsound;
+    public AudioSource gameOver;
+   
 
 
-	public int CurrentHealth
+    public int CurrentHealth
     {
         get
         {
@@ -139,10 +144,10 @@ public class boat : MonoBehaviour {
 				h = 0;
 			}
 			*/
-			h = (float)Math.Pow(inputSpeed/10, 3);
+			h = (float)Math.Pow(inputSpeed/10, 2);
 		}
 
-		print (h);
+		//print (h);
         
         //float v = Input.GetAxis("Vertical");        
 
@@ -175,6 +180,7 @@ public class boat : MonoBehaviour {
             //print("shottttttttttttttttttttttttttttt");
             nextFire = Time.time + fireRate;
             Instantiate(shot, leftShot.position, leftShot.rotation);
+            shootsound.Play();
         }
 
         // Shooting right wave
@@ -227,12 +233,14 @@ public class boat : MonoBehaviour {
                 print("boat hits rock - destroy rock and take life from boat");
                 StartCoroutine(CooldownDmg());
                 CurrentHealth -= 24;
+                hit.Play();
             }
             else if (!onCD && col.collider.name == "toad 1")
             {
                 print("boat hits monster - destroy monster and take life from boat");
                 StartCoroutine(CooldownDmg());
                 CurrentHealth -= 45;
+                hit.Play();
             }
             else if (col.collider.name == "Shooting_Wave(Clone)")
             {
@@ -246,6 +254,7 @@ public class boat : MonoBehaviour {
             Quaternion rot = Quaternion.FromToRotation(Vector3.up, contact.normal);
             Vector3 pos = contact.point;
             Instantiate(explosionPrefab, pos, rot);
+            gameOver.Play();
             //gameObject.transform.localScale = new Vector3(0, 0, 0);
             StartCoroutine(WaitAndRestart(0.5F));
             
@@ -264,8 +273,10 @@ public class boat : MonoBehaviour {
 		Destroy(gameObject, 1);
 		yield return new WaitForSeconds(waitTime);
 		print ("waiting to restart...");
-		SceneManager.LoadScene(firstlevel);
-	}
+        
+        SceneManager.LoadScene(firstlevel);
+       
+}
 
     private float MapVlaues(float x, float inMin, float inMax, float outMin, float outMax)
     {

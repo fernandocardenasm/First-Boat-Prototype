@@ -24,7 +24,7 @@ public class WinText : MonoBehaviour {
 
 	{
 		winText = Canvas.GetComponentInChildren<Text> ();
-		//winText.color = Color.clear;
+		winText.color = Color.clear;
 
         // if it is the 1st level, 2nd comes
         if (SceneManager.GetActiveScene().buildIndex == firstlevel)
@@ -71,7 +71,7 @@ public class WinText : MonoBehaviour {
 	{
 		if (finish)
 		{
-			//winText.color = Color.Lerp (winText.color, Color.red, fadeSpeed * Time.deltaTime);
+			winText.color = Color.Lerp (winText.color, Color.red, fadeSpeed * Time.deltaTime);
 		}
 	}
 

@@ -283,10 +283,10 @@ public class boat : MonoBehaviour {
                 print("boat hits ball - destroy ball and add life to boat");
                 print(col.gameObject.name);
                 BH = GameObject.Find(col.gameObject.name);
-                if (currentHealth != 100)
+                if (currentHealth < 100)
                 {
                     Destroy(BH);
-                    CurrentHealth += 24;
+					CurrentHealth = Mathf.Min (CurrentHealth + 24, 100);
                 }
                 else
                 {

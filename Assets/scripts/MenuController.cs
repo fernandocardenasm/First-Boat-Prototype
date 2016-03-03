@@ -14,6 +14,7 @@ public class MenuController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		PlayerPrefs.SetInt ("isEndless", 0); 
 		currentSelection = 0;
 		Vector2 tridentPos = trident.GetComponent<RectTransform> ().anchoredPosition;
 		tridentYpos = tridentPos.y;
@@ -55,6 +56,7 @@ public class MenuController : MonoBehaviour {
 			SceneManager.LoadScene (introScene);
 			break;
 		case 1:  //start endless mode
+			PlayerPrefs.SetInt("isEndless", 1);
 			SceneManager.LoadScene (firstlevel);
 			break;
 		case 2: //go to credits

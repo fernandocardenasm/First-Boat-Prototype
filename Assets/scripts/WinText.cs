@@ -34,7 +34,11 @@ public class WinText : MonoBehaviour {
         {
             sceneToLoad = thirdlevel;
         } else {
-            sceneToLoad = firstlevel;
+			int isEndless = PlayerPrefs.GetInt ("isEndless");
+			if (isEndless == 1)
+				sceneToLoad = firstlevel;
+			else
+				sceneToLoad = _endscene;
         }
 
 	}

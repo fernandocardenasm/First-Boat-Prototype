@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class IntroSlideshow : MonoBehaviour {
 	public Canvas canvas;
 	public RawImage ImageOnPanel;
+	public RawImage textbox;
 	public Text text;
 	public Texture2D[] introPics = new Texture2D [4]; 
 	public string[] introTexts = new string[4];
@@ -44,18 +45,21 @@ public class IntroSlideshow : MonoBehaviour {
 
 	void ChangeSlide(int picNumber)
 	{
-		//img.CrossFadeAlpha (0.3F, 1F, false);
-		//text.CrossFadeAlpha (0.0F, 0.5F, false);
-		//WaittoLoad (1F);
-		img.texture = introPics[picNumber];
-		text.text = introTexts [textNumber];
+		img.CrossFadeAlpha (0F, 1.5F, false);
+		text.CrossFadeAlpha (0.0F, 1.5F, false);
+		textbox.CrossFadeAlpha(0.0F, 1.5F, false);
+		StartCoroutine(WaittoLoad (2F));
+
 
 
 	}
 
 	void LoadImage(int picNumber) {
-		img.CrossFadeAlpha (1.0F, 0.5F, false);
-		text.CrossFadeAlpha (1.0F, 0.5F, false);
+		img.texture = introPics[picNumber];
+		text.text = introTexts [textNumber];
+		img.CrossFadeAlpha (1.0F, 1F, false);
+		text.CrossFadeAlpha (1.0F, 1F, false);
+		textbox.CrossFadeAlpha (1.0F, 1F, false);
 	}
 
 	IEnumerator WaittoLoad(float waitTime) {
@@ -63,4 +67,6 @@ public class IntroSlideshow : MonoBehaviour {
 		LoadImage (picNumber);
 
 	}
+
+
 }

@@ -11,12 +11,14 @@ public class MenuController : MonoBehaviour {
 	float tridentYpos;
 	int firstlevel = 1;
 	int introScene = 5;
+	float tridentStarty;
 
 	// Use this for initialization
 	void Start () {
 		PlayerPrefs.SetInt ("isEndless", 0); 
 		currentSelection = 0;
 		Vector2 tridentPos = trident.GetComponent<RectTransform> ().anchoredPosition;
+		tridentStarty = tridentPos.y;
 		tridentYpos = tridentPos.y;
 		canvas = canvas.GetComponent<Canvas> ();
 	}
@@ -69,7 +71,7 @@ public class MenuController : MonoBehaviour {
 
 	void updateTridentPos(int selectedPos)
 	{
-		tridentYpos = -(selectedPos * 40);
+		tridentYpos = -(selectedPos * 40) + tridentStarty;
 		Vector2 tridentPos = trident.GetComponent<RectTransform> ().anchoredPosition;
 		trident.GetComponent<RectTransform> ().anchoredPosition = new Vector2 (tridentPos.x, tridentYpos);
 		//print (trident.GetComponent<RectTransform> ().anchoredPosition);

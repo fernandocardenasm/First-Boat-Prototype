@@ -21,14 +21,18 @@ public class IntroSlideshow : MonoBehaviour {
 		img = (RawImage)ImageOnPanel.GetComponent<RawImage> ();
 		img.texture = introPics[picNumber];
 		text.text = introTexts [textNumber];
-
+		img.CrossFadeAlpha (0.0F, 0.01F, false);
+		text.CrossFadeAlpha (0.0F, 0.01F, false);
+		textbox.CrossFadeAlpha(0.0F,0.01F, false);
+		StartCoroutine (WaittoLoad (0.2F));
 
 	}
 
 	// Update is called once per frame
 	void Update () {
+
 		currentTime += Time.deltaTime;
-		if (currentTime >= 5.0 && picNumber < 4) {
+		if (currentTime >= 12.0 && picNumber < 4) {
 			picNumber++;
 			textNumber++;
 			ChangeSlide (picNumber);
@@ -56,16 +60,28 @@ public class IntroSlideshow : MonoBehaviour {
 
 	void LoadImage(int picNumber) {
 		img.texture = introPics[picNumber];
-		text.text = introTexts [textNumber];
+		//text.text = introTexts [textNumber];
 		img.CrossFadeAlpha (1.0F, 1F, false);
 		text.CrossFadeAlpha (1.0F, 1F, false);
 		textbox.CrossFadeAlpha (1.0F, 1F, false);
+		StartCoroutine (AnimateText( introTexts [textNumber]));
 	}
 
 	IEnumerator WaittoLoad(float waitTime) {
 		yield return new WaitForSeconds(waitTime);
 		LoadImage (picNumber);
 
+	}
+
+	IEnumerator AnimateText(string completeStr)
+	{
+		int i = 0;
+		string str = "";
+		while (i< completeStr.Length) {
+			str += completeStr[i++];
+			yield return new WaitForSeconds(0.1F);
+			text.text = str;
+		}
 	}
 
 
